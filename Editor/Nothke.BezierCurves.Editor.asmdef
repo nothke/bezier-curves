@@ -1,0 +1,18 @@
+{
+    "name": "Nothke.BezierCurves.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:1715bda4d5242574299c31bcbda4dbfb"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
