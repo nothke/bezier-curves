@@ -29,6 +29,7 @@ public class BezierCurveEditor : Editor
     bool regionSelect;
 
     List<int> selectedPoints;
+    Quaternion multieditRotation = Quaternion.identity;
 
     void OnEnable()
     {
@@ -232,16 +233,8 @@ public class BezierCurveEditor : Editor
                 Vector3 pos = curve[i].position;
                 avgPosition += pos / sct;
 
-                if (Tools.current == Tool.Move)
-                {
-                    float size = HandleUtility.GetHandleSize(pos) * 0.1f;
-                    Handles.SphereHandleCap(-1, pos, Quaternion.identity, size, EventType.Repaint);
-                    //curve[i].position = Handles.PositionHandle(curve[i].position, Quaternion.identity);
-                }
-                else if (Tools.current == Tool.Rotate)
-                {
-                    curve[i].transform.rotation = Handles.RotationHandle(curve[i].transform.rotation, curve[i].position);
-                }
+                float size = HandleUtility.GetHandleSize(pos) * 0.1f;
+                Handles.SphereHandleCap(-1, pos, Quaternion.identity, size, EventType.Repaint);
             }
 
             if (selectedPoints.Count > 0)
@@ -263,7 +256,27 @@ public class BezierCurveEditor : Editor
                 }
                 else if (Tools.current == Tool.Rotate)
                 {
-                    Quaternion targetRot = Handles.RotationHandle(Quaternion.identity, avgPosition);
+                    Quaternion gizmoRot = Handles.RotationHandle(Quaternion.identity, avgPosition);
+
+                    Quaternion targetRot = multieditRotation * Quaternion.Inverse(gizmoRot);//
+                    
+
+                    if (targetRot != Quaternion.identity)
+                    {
+                        Debug.Log(targetRot);
+                        for (int sp = 0; sp < sct; sp++)
+                        {
+                            int i = selectedPoints[sp];
+
+                            Vector3 posDiff = curve[i].position - avgPosition;
+                            Vector3 newPos = targetRot * posDiff;
+
+                            curve[i].position = avgPosition + newPos;
+                            //curve[i].transform.rotation *= targetRot;
+                        }
+                    }
+
+                    multieditRotation = gizmoRot;
                 }
             }
 
@@ -280,6 +293,7 @@ public class BezierCurveEditor : Editor
                 }
                 else if (Event.current.type == EventType.MouseUp)
                 {
+                    multieditRotation = Quaternion.identity;
                     regionSelect = false;
                 }
             }
