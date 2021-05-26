@@ -46,6 +46,11 @@ public class BezierCurveEditor : Editor
         dlg = new EditorApplication.CallbackFunction(RemovePoint);
 
         selectedPoints = new List<int>();
+
+        if (toolMode == ToolMode.Editing)
+            Tools.hidden = true;
+        else
+            ExitEditMode();
     }
 
     public override void OnInspectorGUI()
@@ -273,7 +278,6 @@ public class BezierCurveEditor : Editor
                 {
                     if (Event.current.button == 0 && Event.current.type == EventType.MouseUp)
                     {
-                        Debug.Log("Mouse up");
                         multieditRotation = Quaternion.identity;
                         lastRotation = Quaternion.identity;
                     }
@@ -318,8 +322,6 @@ public class BezierCurveEditor : Editor
                 {
                     //GUIUtility.hotControl = controlId;
                     //Event.current.Use();
-
-                    Debug.Log("Mouse up");
 
                     multieditRotation = Quaternion.identity;
                     lastRotation = Quaternion.identity;
