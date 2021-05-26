@@ -16,6 +16,16 @@ public class BezierCurveEditor : Editor
     EditorApplication.CallbackFunction dlg;
     BezierPoint pointToDestroy;
 
+    bool createDragging;
+
+    enum ToolMode { None, Creating, Editing };
+    ToolMode toolMode;
+    ToolMode lastToolMode = ToolMode.None;
+
+    string[] toolModesText = { "None", "Add", "Multiedit" };
+
+    Vector3 selectionStartPos;
+
     void OnEnable()
     {
         curve = (BezierCurve)target;
@@ -72,32 +82,23 @@ public class BezierCurveEditor : Editor
             }*/
         }
 
-        createPoints = GUILayout.Toggle(createPoints, "Add", "button");
+        toolMode = (ToolMode)GUILayout.SelectionGrid((int)toolMode, toolModesText, 3);
 
-        if (createPoints != lastCreatePoints)
+        if (toolMode != lastToolMode)
         {
-            StartMakingPoints();
+            if (toolMode == ToolMode.Editing)
+                Tools.hidden = true;
+            else
+                Tools.hidden = false;
         }
 
-
-
-        lastCreatePoints = createPoints;
+        lastToolMode = toolMode;
 
         if (GUI.changed)
         {
             serializedObject.ApplyModifiedProperties();
             EditorUtility.SetDirty(target);
         }
-    }
-
-    bool createPoints;
-    bool lastCreatePoints = false;
-
-    bool createDragging;
-
-    void StartMakingPoints()
-    {
-
     }
 
     void OnSceneGUI()
@@ -107,7 +108,7 @@ public class BezierCurveEditor : Editor
             DrawPointSceneGUI(curve[i]);
         }
 
-        if (createPoints)
+        if (toolMode == ToolMode.Creating)
         {
             int controlId = GUIUtility.GetControlID(FocusType.Passive);
 
@@ -169,6 +170,36 @@ public class BezierCurveEditor : Editor
                     createDragging = false;
                 }
             }
+        }
+        else if (toolMode == ToolMode.Editing)
+        {
+            //SceneView.lastActiveSceneView.drawGizmos = false;
+            int controlId = GUIUtility.GetControlID(FocusType.Passive);
+
+            for (int i = 0; i < curve.pointCount; i++)
+            {
+                if (Tools.current == Tool.Move)
+                    curve[i].position = Handles.PositionHandle(curve[i].position, Quaternion.identity);
+                else if (Tools.current == Tool.Rotate)
+                    curve[i].transform.rotation = Handles.RotationHandle(curve[i].transform.rotation, curve[i].position);
+            }
+
+            if (Event.current.type == EventType.MouseDown)
+            {
+                if (Event.current.button == 0)
+                {
+                    GUIUtility.hotControl = controlId;
+                    Event.current.Use();
+
+                    selectionStartPos = Event.current.mousePosition;
+                }
+            }
+
+            //GUIUtility.hotControl = controlId;
+            //Event.current.Use();
+
+            //Handles.SelectionFrame(-1, selectionStartPos, Quaternion.identity, 20);
+            Handles.DrawSelectionFrame(-1, selectionStartPos, Quaternion.identity, 20, EventType.Repaint);
         }
     }
 
