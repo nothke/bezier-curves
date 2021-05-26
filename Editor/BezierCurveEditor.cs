@@ -47,6 +47,7 @@ public class BezierCurveEditor : Editor
                 DrawPointInspector(curve[i], i);
             }
 
+            /*
             if (GUILayout.Button("Add Point"))
             {
 
@@ -68,10 +69,10 @@ public class BezierCurveEditor : Editor
 
                 pointsProp.InsertArrayElementAtIndex(pointsProp.arraySize);
                 pointsProp.GetArrayElementAtIndex(pointsProp.arraySize - 1).objectReferenceValue = newPoint;
-            }
+            }*/
         }
 
-        createPoints = GUILayout.Toggle(createPoints, "Click to add", "button");
+        createPoints = GUILayout.Toggle(createPoints, "Add", "button");
 
         if (createPoints != lastCreatePoints)
         {
