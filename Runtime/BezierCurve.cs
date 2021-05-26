@@ -397,6 +397,33 @@ public class BezierCurve : MonoBehaviour
         dirty = true;
     }
 
+    /// <summary>
+    /// Moves the transform position to the center of bounds of all points, without moving the points
+    /// </summary>
+    public void CenterPivot()
+    {
+        if (pointCount == 0)
+            return;
+
+        Bounds bounds = new Bounds(points[0].position, Vector3.zero);
+
+        for (int i = 1; i < points.Length; i++)
+        {
+            bounds.Encapsulate(points[i].position);
+        }
+
+        Vector3 targetPosition = bounds.center;
+
+        Vector3 offset = targetPosition - transform.position;
+
+        transform.position = targetPosition;
+
+        for (int i = 0; i < points.Length; i++)
+        {
+            points[i].position -= offset;
+        }
+    }
+
     #endregion
 
     #region PublicStaticFunctions

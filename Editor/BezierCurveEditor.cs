@@ -94,6 +94,13 @@ public class BezierCurveEditor : Editor
 
         lastToolMode = toolMode;
 
+        if (GUILayout.Button("Center pivot"))
+        {
+            curve.CenterPivot();
+            serializedObject.ApplyModifiedProperties();
+            Undo.RegisterFullObjectHierarchyUndo(curve, "Center pivot");
+        }
+
         if (GUI.changed)
         {
             serializedObject.ApplyModifiedProperties();
